@@ -122,7 +122,6 @@
                         <button class="search-btn" onclick="searchProducts()">🔍</button>
                     </div>
                     <div class="header-actions">
-                        <button class="header-btn" onclick="openAdmin()">⚙️ Admin</button>
                         <button class="header-btn" onclick="toggleCart()">🛒 Cart<span class="cart-badge" id="cartCount">0</span></button>
                     </div>
                 </div>
@@ -205,6 +204,14 @@
         let products=[{id:1,name:'Brass Ganesha Idol',category:'idols',price:899,originalPrice:1299,icon:'🐘',description:'Handcrafted brass Ganesha idol for prosperity and success',stock:50,rating:4.8},{id:2,name:'Lakshmi Murti',category:'idols',price:1299,originalPrice:1799,icon:'🪷',description:'Beautiful goddess Lakshmi statue in premium brass',stock:30,rating:4.9},{id:3,name:'Shiva Lingam',category:'idols',price:699,originalPrice:999,icon:'🕉️',description:'Sacred Shiva Lingam in authentic black stone',stock:40,rating:4.7},{id:4,name:'Sandalwood Incense',category:'incense',price:199,originalPrice:299,icon:'🌿',description:'Premium sandalwood incense sticks (100 pcs)',stock:200,rating:4.6},{id:5,name:'Mogra Agarbatti',category:'incense',price:149,originalPrice:199,icon:'🌸',description:'Fragrant mogra incense sticks for daily puja',stock:150,rating:4.5},{id:6,name:'Dhoop Cones',category:'incense',price:179,originalPrice:249,icon:'💨',description:'Traditional dhoop cones (50 pcs)',stock:100,rating:4.4},{id:7,name:'Brass Diya Set',category:'lamps',price:449,originalPrice:649,icon:'🪔',description:'Set of 5 brass diyas with decorative stand',stock:80,rating:4.8},{id:8,name:'Electric Diya',category:'lamps',price:599,originalPrice:899,icon:'💡',description:'LED electric diya with remote control',stock:60,rating:4.7},{id:9,name:'Hanging Diya',category:'lamps',price:349,originalPrice:499,icon:'🏮',description:'Decorative hanging brass diya',stock:70,rating:4.6},{id:10,name:'Puja Thali Set',category:'accessories',price:799,originalPrice:1199,icon:'🥘',description:'Complete brass puja thali with all accessories',stock:45,rating:4.9},{id:11,name:'Kalash (Lota)',category:'accessories',price:399,originalPrice:599,icon:'🏺',description:'Brass kalash for holy water',stock:90,rating:4.5},{id:12,name:'Ghanti (Bell)',category:'accessories',price:299,originalPrice:449,icon:'🔔',description:'Traditional brass puja bell with handle',stock:120,rating:4.7},{id:13,name:'Camphor Tablets',category:'offerings',price:99,originalPrice:149,icon:'⚪',description:'Pure camphor tablets (100g)',stock:300,rating:4.8},{id:14,name:'Kumkum & Haldi',category:'offerings',price:129,originalPrice:179,icon:'🔴',description:'Organic kumkum and turmeric powder',stock:250,rating:4.6},{id:15,name:'Sacred Thread',category:'accessories',price:79,originalPrice:129,icon:'🧵',description:'Cotton sacred thread (moli/kalava)',stock:400,rating:4.5},{id:16,name:'Rudraksha Mala',category:'accessories',price:549,originalPrice:799,icon:'📿',description:'108 beads authentic rudraksha mala',stock:35,rating:4.9}];
         let cart=JSON.parse(localStorage.getItem('pujaExpressCart'))||[];
         let currentFilter='all';
+
+        // Secret admin access - Press Ctrl+Shift+A
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                openAdmin();
+            }
+        });
+
         function init(){loadProducts();renderProducts();updateCartUI();}
         function loadProducts(){const savedProducts=localStorage.getItem('pujaExpressProducts');if(savedProducts){products=JSON.parse(savedProducts);}}
         function saveProducts(){localStorage.setItem('pujaExpressProducts',JSON.stringify(products));}
