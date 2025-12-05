@@ -68,6 +68,13 @@
         .modal-title { font-size: 2em; font-weight: 700; color: var(--dark); }
         .close-modal { font-size: 2.5em; cursor: pointer; color: #999; transition: all 0.3s; line-height: 1; }
         .close-modal:hover { color: var(--danger); transform: rotate(90deg); }
+        .password-container { text-align: center; padding: 40px; }
+        .password-container h3 { margin-bottom: 20px; color: var(--primary); }
+        .password-input { width: 100%; max-width: 400px; padding: 15px 20px; border: 2px solid #ddd; border-radius: 15px; font-size: 1.1em; margin: 20px auto; display: block; text-align: center; }
+        .password-input:focus { outline: none; border-color: var(--primary); }
+        .password-submit { padding: 15px 40px; background: var(--primary); color: white; border: none; border-radius: 25px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .password-submit:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255,107,53,0.4); }
+        .password-error { color: var(--danger); margin-top: 15px; font-weight: 600; }
         .cart-item { display: flex; gap: 20px; padding: 20px; border-bottom: 2px solid #f0f0f0; align-items: center; }
         .cart-item-image { font-size: 3em; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; background: var(--light); border-radius: 15px; }
         .cart-item-info { flex: 1; }
@@ -173,6 +180,17 @@
             <div id="cartItems"></div>
         </div>
     </div>
+    <div class="modal" id="passwordModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header"><h2 class="modal-title">Admin Access</h2><span class="close-modal" onclick="closePasswordModal()">×</span></div>
+            <div class="password-container">
+                <h3>🔐 Enter Admin Password</h3>
+                <input type="password" id="adminPassword" class="password-input" placeholder="Enter password" onkeypress="if(event.key==='Enter') verifyPassword()">
+                <button class="password-submit" onclick="verifyPassword()">Access Admin Panel</button>
+                <div id="passwordError" class="password-error"></div>
+            </div>
+        </div>
+    </div>
     <div class="modal" id="adminModal">
         <div class="modal-content">
             <div class="modal-header"><h2 class="modal-title">Admin Panel - Add New Product</h2><span class="close-modal" onclick="closeAdmin()">×</span></div>
@@ -201,16 +219,39 @@
         </div>
     </footer>
     <script>
+        const ADMIN_PASSWORD = 'PujaExpress@2025';
         let products=[{id:1,name:'Brass Ganesha Idol',category:'idols',price:899,originalPrice:1299,icon:'🐘',description:'Handcrafted brass Ganesha idol for prosperity and success',stock:50,rating:4.8},{id:2,name:'Lakshmi Murti',category:'idols',price:1299,originalPrice:1799,icon:'🪷',description:'Beautiful goddess Lakshmi statue in premium brass',stock:30,rating:4.9},{id:3,name:'Shiva Lingam',category:'idols',price:699,originalPrice:999,icon:'🕉️',description:'Sacred Shiva Lingam in authentic black stone',stock:40,rating:4.7},{id:4,name:'Sandalwood Incense',category:'incense',price:199,originalPrice:299,icon:'🌿',description:'Premium sandalwood incense sticks (100 pcs)',stock:200,rating:4.6},{id:5,name:'Mogra Agarbatti',category:'incense',price:149,originalPrice:199,icon:'🌸',description:'Fragrant mogra incense sticks for daily puja',stock:150,rating:4.5},{id:6,name:'Dhoop Cones',category:'incense',price:179,originalPrice:249,icon:'💨',description:'Traditional dhoop cones (50 pcs)',stock:100,rating:4.4},{id:7,name:'Brass Diya Set',category:'lamps',price:449,originalPrice:649,icon:'🪔',description:'Set of 5 brass diyas with decorative stand',stock:80,rating:4.8},{id:8,name:'Electric Diya',category:'lamps',price:599,originalPrice:899,icon:'💡',description:'LED electric diya with remote control',stock:60,rating:4.7},{id:9,name:'Hanging Diya',category:'lamps',price:349,originalPrice:499,icon:'🏮',description:'Decorative hanging brass diya',stock:70,rating:4.6},{id:10,name:'Puja Thali Set',category:'accessories',price:799,originalPrice:1199,icon:'🥘',description:'Complete brass puja thali with all accessories',stock:45,rating:4.9},{id:11,name:'Kalash (Lota)',category:'accessories',price:399,originalPrice:599,icon:'🏺',description:'Brass kalash for holy water',stock:90,rating:4.5},{id:12,name:'Ghanti (Bell)',category:'accessories',price:299,originalPrice:449,icon:'🔔',description:'Traditional brass puja bell with handle',stock:120,rating:4.7},{id:13,name:'Camphor Tablets',category:'offerings',price:99,originalPrice:149,icon:'⚪',description:'Pure camphor tablets (100g)',stock:300,rating:4.8},{id:14,name:'Kumkum & Haldi',category:'offerings',price:129,originalPrice:179,icon:'🔴',description:'Organic kumkum and turmeric powder',stock:250,rating:4.6},{id:15,name:'Sacred Thread',category:'accessories',price:79,originalPrice:129,icon:'🧵',description:'Cotton sacred thread (moli/kalava)',stock:400,rating:4.5},{id:16,name:'Rudraksha Mala',category:'accessories',price:549,originalPrice:799,icon:'📿',description:'108 beads authentic rudraksha mala',stock:35,rating:4.9}];
         let cart=JSON.parse(localStorage.getItem('pujaExpressCart'))||[];
         let currentFilter='all';
+        let isAdminAuthenticated=false;
 
-        // Secret admin access - Press Ctrl+Shift+A
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                openAdmin();
+                e.preventDefault();
+                document.getElementById('passwordModal').style.display='flex';
+                document.getElementById('adminPassword').focus();
             }
         });
+
+        function verifyPassword(){
+            const password=document.getElementById('adminPassword').value;
+            if(password===ADMIN_PASSWORD){
+                isAdminAuthenticated=true;
+                closePasswordModal();
+                openAdmin();
+                document.getElementById('adminPassword').value='';
+                document.getElementById('passwordError').textContent='';
+            }else{
+                document.getElementById('passwordError').textContent='❌ Incorrect password!';
+                document.getElementById('adminPassword').value='';
+            }
+        }
+
+        function closePasswordModal(){
+            document.getElementById('passwordModal').style.display='none';
+            document.getElementById('adminPassword').value='';
+            document.getElementById('passwordError').textContent='';
+        }
 
         function init(){loadProducts();renderProducts();updateCartUI();}
         function loadProducts(){const savedProducts=localStorage.getItem('pujaExpressProducts');if(savedProducts){products=JSON.parse(savedProducts);}}
@@ -225,7 +266,14 @@
         function removeFromCart(productId){cart=cart.filter(item=>item.id!==productId);updateCartUI();showNotification('Item removed from cart');}
         function toggleCart(){const modal=document.getElementById('cartModal');modal.style.display=modal.style.display==='flex'?'none':'flex';}
         function proceedToCheckout(){if(cart.length===0){showNotification('Your cart is empty!','warning');return;}const total=cart.reduce((sum,item)=>sum+(item.price*item.quantity),0);const shipping=total>=999?0:99;const finalTotal=total+shipping;const orderDetails=`ORDER SUMMARY\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${cart.map(item=>`${item.name} × ${item.quantity} = ₹${item.price*item.quantity}`).join('\n')}\n\nSubtotal: ₹${total}\nShipping (Shiprocket): ${shipping===0?'FREE':'₹'+shipping}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nTOTAL: ₹${finalTotal}\n\n🚚 Delivery via Shiprocket (3-5 business days)\n💳 Payment Gateway: Razorpay/Paytm/UPI\n\nYour order will be processed and shipped within 24 hours!`;alert(orderDetails+'\n\n✅ Redirecting to payment gateway...\n\n(In production, this will integrate with Razorpay/Paytm)');cart=[];updateCartUI();toggleCart();showNotification('Order placed successfully! 🎉');}
-        function openAdmin(){document.getElementById('adminModal').style.display='flex';renderAdminProducts();}
+        function openAdmin(){
+            if(!isAdminAuthenticated){
+                showNotification('Please authenticate first!','warning');
+                return;
+            }
+            document.getElementById('adminModal').style.display='flex';
+            renderAdminProducts();
+        }
         function closeAdmin(){document.getElementById('adminModal').style.display='none';}
         function addProduct(event){event.preventDefault();const newProduct={id:Date.now(),name:document.getElementById('productName').value,category:document.getElementById('productCategory').value,icon:document.getElementById('productIcon').value,description:document.getElementById('productDescription').value,price:parseInt(document.getElementById('productPrice').value),originalPrice:parseInt(document.getElementById('productOriginalPrice').value)||null,stock:parseInt(document.getElementById('productStock').value),rating:4.5};products.push(newProduct);saveProducts();renderProducts();renderAdminProducts();event.target.reset();showNotification('Product added successfully! ✅');}
         function renderAdminProducts(){const container=document.getElementById('adminProductList');container.innerHTML=products.map(product=>`<div style="padding: 15px; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;"><div><strong>${product.icon} ${product.name}</strong><div style="color: #666; font-size: 0.9em;">₹${product.price} | Stock: ${product.stock}</div></div><button onclick="deleteProduct(${product.id})" style="padding: 8px 15px; background: var(--danger); color: white; border: none; border-radius: 15px; cursor: pointer;">Delete</button></div>`).join('');}
